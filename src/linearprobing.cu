@@ -2,6 +2,7 @@
 #include "stdint.h"
 #include "vector"
 #include "linearprobing.h"
+#include "assert.h"
 
 // 32 bit Murmur3 hash
 __device__ uint32_t hash(uint32_t k)
@@ -62,8 +63,8 @@ void insert_hashtable(KeyValue* pHashTable, const KeyValue* kvs, uint32_t num_kv
     // Have CUDA calculate the thread block size
     int mingridsize;
     int threadblocksize;
-    cudaOccupancyMaxPotentialBlockSize(&mingridsize, &threadblocksize, gpu_hashtable_insert, 0, 0);
-
+    auto cudaError = cudaOccupancyMaxPotentialBlockSize(&mingridsize, &threadblocksize, gpu_hashtable_insert, 0, 0);
+    assert(cudaError == 0);
     // Create events for GPU timing
     cudaEvent_t start, stop;
     cudaEventCreate(&start);
